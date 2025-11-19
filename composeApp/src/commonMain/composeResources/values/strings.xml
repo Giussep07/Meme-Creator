@@ -1,0 +1,23 @@
+<resources>
+    <string name="title_new_meme">New meme</string>
+    <string name="meme_templates">Meme Templates</string>
+    <string name="meme_empty_list">Tap + button to create your first meme</string>
+    <string name="add_text">Add text</string>
+    <string name="save_meme">Save meme</string>
+    <string name="save_to_device">Save to device</string>
+    <string name="save_to_device_desc">Save created meme in the Files of your device</string>
+    <string name="share_meme">Share the meme</string>
+    <string name="share_meme_desc">Share your meme or open it in the other App</string>
+    <string name="choose_template">Choose template</string>
+    <string name="choose_template_desc">Choose template for your next meme masterpiece</string>
+    <string name="create_first_meme">Choose template for your next meme masterpiece</string>
+    <string name="delete_meme">Delete meme</string>
+    <string name="delete_meme_desc">Permanently delete this meme from your device</string>
+    <string name="leave_editor_title">Leave editor?</string>
+    <string name="leave_editor_message">You will lose your precious meme. If you're fine with that, press &apos;Leave&apos;.</string>
+    <string name="cancel">Cancel</string>
+    <string name="leave">Leave</string>
+    <string name="delete_meme_title">Delete meme?</string>
+    <string name="delete_meme_message">Are you sure you want to delete this precious meme?</string>
+    <string name="delete_meme_success">Meme successfully deleted!</string>
+</resources>
