@@ -9,9 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.giussepr.memecreator.core.presentation.MemeTemplate
 import dev.giussepr.memecreator.core.theme.MemeCreatorTheme
+import dev.giussepr.memecreator.meme_editor.presentation.components.MemeTextBox
 import memecreator.composeapp.generated.resources.Res
 import memecreator.composeapp.generated.resources.meme_template_01
 import org.jetbrains.compose.resources.painterResource
@@ -28,7 +30,7 @@ fun MemeEditorRoot(
     MemeEditorScreen(
         template = template,
         state = state,
-        onEvent = viewModel::onViewIntent
+        onViewIntent = viewModel::onViewIntent
     )
 }
 
@@ -36,7 +38,7 @@ fun MemeEditorRoot(
 fun MemeEditorScreen(
     template: MemeTemplate,
     state: MemeEditorUiState,
-    onEvent: (MemeEditorViewIntent) -> Unit
+    onViewIntent: (MemeEditorViewIntent) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -49,6 +51,26 @@ fun MemeEditorScreen(
             contentDescription = null,
             contentScale = ContentScale.FillWidth
         )
+        state.memeTexts.forEach { memeText ->
+            MemeTextBox(
+                memeText = memeText,
+                textBoxInteractionState = state.textBoxInteractionState,
+                maxWidth = 500.dp,
+                maxHeight = 500.dp,
+                onClick = {
+                    onViewIntent(MemeEditorViewIntent.OnSelectMemeText(memeText.id))
+                },
+                onDoubleClick = {
+                    onViewIntent(MemeEditorViewIntent.OnEditMemeText(memeText.id))
+                },
+                onTextChange = {
+                    onViewIntent(MemeEditorViewIntent.OnMemeTextChange(memeText.id, it))
+                },
+                onDeleteClick = {
+                    onViewIntent(MemeEditorViewIntent.OnDeleteMemeTextClick(memeText.id))
+                }
+            )
+        }
     }
 }
 
@@ -62,7 +84,7 @@ private fun Preview() {
                 drawable = Res.drawable.meme_template_01
             ),
             state = MemeEditorUiState(),
-            onEvent = {},
+            onViewIntent = {},
         )
     }
 }

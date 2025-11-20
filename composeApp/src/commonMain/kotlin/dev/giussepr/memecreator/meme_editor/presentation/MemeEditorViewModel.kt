@@ -31,21 +31,61 @@ class MemeEditorViewModel : ViewModel() {
             MemeEditorViewIntent.OnAddTextClick -> TODO()
             MemeEditorViewIntent.OnConfirmLeaveWithoutSaving -> TODO()
             is MemeEditorViewIntent.OnContainerSizeChange -> updateContainerSize(event.size)
-            is MemeEditorViewIntent.OnDeleteMemeTextClick -> TODO()
+            is MemeEditorViewIntent.OnDeleteMemeTextClick -> deleteMemeText(event.id)
             MemeEditorViewIntent.OnDismissLeaveWithoutSaving -> TODO()
-            is MemeEditorViewIntent.OnEditMemeText -> TODO()
+            is MemeEditorViewIntent.OnEditMemeText -> editMemeText(event.id)
             MemeEditorViewIntent.OnGoBackClick -> TODO()
-            is MemeEditorViewIntent.OnMemeTextChange -> TODO()
+            is MemeEditorViewIntent.OnMemeTextChange -> updateMemeText(event.id, event.text)
             is MemeEditorViewIntent.OnMemeTextTransformChange -> TODO()
             is MemeEditorViewIntent.OnSaveMemeClick -> TODO()
-            is MemeEditorViewIntent.OnSelectMemeText -> TODO()
+            is MemeEditorViewIntent.OnSelectMemeText -> selectMemeText(event.id)
             MemeEditorViewIntent.OnTapOutsideSelectedText -> TODO()
         }
     }
 
+    private fun deleteMemeText(id: String) {
+        _state.update {
+            it.copy(
+                memeTexts = it.memeTexts.filter { memeText ->
+                    memeText.id != id
+                }
+            )
+        }
+    }
+
+    private fun selectMemeText(id: String) {
+        _state.update {
+            it.copy(
+                textBoxInteractionState = TextBoxInteractionState.Selected(id)
+            )
+        }
+    }
+
+    private fun updateMemeText(id: String, text: String) {
+        _state.update {
+            it.copy(
+                memeTexts = it.memeTexts.map { memeText ->
+                    if (memeText.id == id) {
+                        memeText.copy(text = text)
+                    } else memeText
+                }
+            )
+        }
+    }
+
+    private fun editMemeText(id: String) {
+        _state.update {
+            it.copy(
+                textBoxInteractionState = TextBoxInteractionState.Editing(id)
+            )
+        }
+    }
+
     private fun updateContainerSize(size: IntSize) {
-        _state.update { it.copy(
-            templateSize = size
-        ) }
+        _state.update {
+            it.copy(
+                templateSize = size
+            )
+        }
     }
 }
