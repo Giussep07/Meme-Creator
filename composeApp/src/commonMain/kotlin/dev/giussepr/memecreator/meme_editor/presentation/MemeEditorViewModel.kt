@@ -34,12 +34,12 @@ class MemeEditorViewModel : ViewModel() {
     fun onViewIntent(event: MemeEditorViewIntent) {
         when (event) {
             MemeEditorViewIntent.OnAddTextClick -> addText()
-            MemeEditorViewIntent.OnConfirmLeaveWithoutSaving -> TODO()
+            MemeEditorViewIntent.OnConfirmLeaveWithoutSaving -> confirmLeave()
             is MemeEditorViewIntent.OnContainerSizeChange -> updateContainerSize(event.size)
             is MemeEditorViewIntent.OnDeleteMemeTextClick -> deleteMemeText(event.id)
-            MemeEditorViewIntent.OnDismissLeaveWithoutSaving -> TODO()
+            MemeEditorViewIntent.OnDismissLeaveWithoutSaving -> dismissConfirmLeaveDialog()
             is MemeEditorViewIntent.OnEditMemeText -> editMemeText(event.id)
-            MemeEditorViewIntent.OnGoBackClick -> TODO()
+            MemeEditorViewIntent.OnGoBackClick -> attemptToGoBack()
             is MemeEditorViewIntent.OnMemeTextChange -> updateMemeText(event.id, event.text)
             is MemeEditorViewIntent.OnMemeTextTransformChange -> transformMemeText(
                 id = event.id,
@@ -47,9 +47,42 @@ class MemeEditorViewModel : ViewModel() {
                 rotation = event.rotation,
                 scale = event.scale
             )
+
             is MemeEditorViewIntent.OnSaveMemeClick -> TODO()
             is MemeEditorViewIntent.OnSelectMemeText -> selectMemeText(event.id)
             MemeEditorViewIntent.OnTapOutsideSelectedText -> unselectMemeText()
+        }
+    }
+
+    private fun dismissConfirmLeaveDialog() {
+        _state.update {
+            it.copy(
+                isLeavingWithoutSaving = false
+            )
+        }
+    }
+
+    private fun confirmLeave() {
+        _state.update {
+            it.copy(
+                hasLeftEditor = true
+            )
+        }
+    }
+
+    private fun attemptToGoBack() {
+        if (state.value.memeTexts.isEmpty()) {
+            _state.update {
+                it.copy(
+                    hasLeftEditor = true
+                )
+            }
+        } else {
+            _state.update {
+                it.copy(
+                    isLeavingWithoutSaving = true
+                )
+            }
         }
     }
 

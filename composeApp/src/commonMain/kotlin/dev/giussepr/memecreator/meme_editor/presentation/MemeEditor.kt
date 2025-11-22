@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package dev.giussepr.memecreator.meme_editor.presentation
 
 import androidx.compose.foundation.Image
@@ -7,11 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -19,19 +29,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.giussepr.memecreator.core.presentation.MemeTemplate
 import dev.giussepr.memecreator.core.theme.MemeCreatorTheme
 import dev.giussepr.memecreator.meme_editor.presentation.components.BottomBar
+import dev.giussepr.memecreator.meme_editor.presentation.components.ConfirmationDialog
+import dev.giussepr.memecreator.meme_editor.presentation.components.ConfirmationDialogConfig
 import dev.giussepr.memecreator.meme_editor.presentation.components.DraggableContainer
 import memecreator.composeapp.generated.resources.Res
+import memecreator.composeapp.generated.resources.cancel
+import memecreator.composeapp.generated.resources.leave
+import memecreator.composeapp.generated.resources.leave_editor_message
+import memecreator.composeapp.generated.resources.leave_editor_title
 import memecreator.composeapp.generated.resources.meme_template_01
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MemeEditorRoot(
     template: MemeTemplate,
+    onBackClick: () -> Unit,
     viewModel: MemeEditorViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.hasLeftEditor) {
+        if (state.hasLeftEditor) {
+            onBackClick()
+        }
+    }
 
     MemeEditorScreen(
         template = template,
@@ -46,6 +70,12 @@ fun MemeEditorScreen(
     state: MemeEditorUiState,
     onViewIntent: (MemeEditorViewIntent) -> Unit
 ) {
+    BackHandler(
+        enabled = state.isLeavingWithoutSaving.not()
+    ) {
+        onViewIntent(MemeEditorViewIntent.OnGoBackClick)
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -113,7 +143,38 @@ fun MemeEditorScreen(
                         .matchParentSize()
                 )
             }
+
+            IconButton(
+                onClick = {
+                    onViewIntent(MemeEditorViewIntent.OnGoBackClick)
+                },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Navigate back"
+                )
+            }
         }
+    }
+
+    if (state.isLeavingWithoutSaving) {
+        ConfirmationDialog(
+            config = ConfirmationDialogConfig(
+                title = stringResource(Res.string.leave_editor_title),
+                message = stringResource(Res.string.leave_editor_message),
+                confirmButtonText = stringResource(Res.string.leave),
+                cancelButtonText = stringResource(Res.string.cancel),
+                confirmButtonColor = MaterialTheme.colorScheme.secondary
+            ),
+            onConfirm = {
+                onViewIntent(MemeEditorViewIntent.OnConfirmLeaveWithoutSaving)
+            },
+            onDismiss = {
+                onViewIntent(MemeEditorViewIntent.OnDismissLeaveWithoutSaving)
+            }
+        )
     }
 }
 
