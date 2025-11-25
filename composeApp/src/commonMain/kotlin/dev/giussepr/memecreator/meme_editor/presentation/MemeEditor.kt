@@ -5,6 +5,7 @@ package dev.giussepr.memecreator.meme_editor.presentation
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -15,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.currentWindowSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -103,16 +105,23 @@ fun MemeEditorScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
+            val windowSize = currentWindowSize()
             Box {
                 Image(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .then(
+                            if (windowSize.width > windowSize.height) {
+                                Modifier.fillMaxHeight()
+                            } else Modifier.fillMaxWidth()
+                        )
                         .onSizeChanged {
                             onViewIntent(MemeEditorViewIntent.OnContainerSizeChange(it))
                         },
                     painter = painterResource(template.drawable),
                     contentDescription = null,
-                    contentScale = ContentScale.FillWidth
+                    contentScale = if (windowSize.width > windowSize.height) {
+                        ContentScale.FillHeight
+                    } else ContentScale.FillWidth
                 )
                 DraggableContainer(
                     children = state.memeTexts,
