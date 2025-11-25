@@ -6,15 +6,24 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.giussepr.memecreator.core.presentation.MemeTemplate
+import dev.giussepr.memecreator.meme_editor.domain.MemeExporter
+import dev.giussepr.memecreator.meme_editor.domain.SaveToStorageStrategy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class MemeEditorViewModel : ViewModel() {
+class MemeEditorViewModel(
+    private val memeExporter: MemeExporter,
+    private val storageStrategy: SaveToStorageStrategy
+) : ViewModel() {
     private var hasLoadedInitialData: Boolean = false
 
     private val _state = MutableStateFlow(MemeEditorUiState())
@@ -48,9 +57,30 @@ class MemeEditorViewModel : ViewModel() {
                 scale = event.scale
             )
 
-            is MemeEditorViewIntent.OnSaveMemeClick -> TODO()
+            is MemeEditorViewIntent.OnSaveMemeClick -> saveMeme(event.memeTemplate)
             is MemeEditorViewIntent.OnSelectMemeText -> selectMemeText(event.id)
             MemeEditorViewIntent.OnTapOutsideSelectedText -> unselectMemeText()
+        }
+    }
+
+    private fun saveMeme(memeTemplate: MemeTemplate) {
+        viewModelScope.launch {
+            memeExporter
+                .exportMeme(
+                    backgroundImageBytes = getDrawableResourceBytes(
+                        environment = getSystemResourceEnvironment(),
+                        resource = memeTemplate.drawable
+                    ),
+                    memeTexts = state.value.memeTexts,
+                    templateSize = state.value.templateSize,
+                    saveToStorageStrategy = storageStrategy
+                )
+                .onSuccess {
+                    println("Worked, $it")
+                }
+                .onFailure {
+                    println("Something went wrong, $it")
+                }
         }
     }
 
