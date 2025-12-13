@@ -20,7 +20,7 @@
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="dev.giussepr.memecreator.fileprovider"
+            android:authorities="com.giussepr.memecreator.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

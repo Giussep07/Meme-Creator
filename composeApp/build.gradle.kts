@@ -60,11 +60,11 @@ kotlin {
 }
 
 android {
-    namespace = "dev.giussepr.memecreator"
+    namespace = "com.giussepr.memecreator"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "dev.giussepr.memecreator"
+        applicationId = "com.giussepr.memecreator"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
